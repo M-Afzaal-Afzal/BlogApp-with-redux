@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import React, {useEffect} from "react";
+import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+} from "react-router-dom";
+import Home from "./components/Home";
+import EditBlog from "./components/EditBlog";
+import AddBlog from "./components/AddBlog";
+import Header from "./components/Header";
+import BlogDetail from "./components/BlogDetail";
+import {useDispatch} from "react-redux";
+import {getBlogs} from "./store/Blog/blogActions";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+
+    const dispatch = useDispatch();
+
+    useEffect(() => {
+        dispatch(getBlogs())
+    })
+
+    return (
+        <Router>
+            <Header/>
+            <Switch>
+                <Route path="/edit/:id">
+                    <EditBlog/>
+                </Route>
+                <Route path="/add">
+                    <AddBlog/>
+                </Route>
+                <Route path="/blog-detail/:id">
+                    <BlogDetail/>
+                </Route>
+                <Route path="/">
+                    <Home/>
+                </Route>
+            </Switch>
+        </Router>
+    );
 }
 
 export default App;
