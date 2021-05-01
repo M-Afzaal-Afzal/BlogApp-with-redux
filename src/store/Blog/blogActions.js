@@ -1,9 +1,9 @@
 import actionTypes from "../actionTypes";
 import {firestore} from "../../utils/firebase";
 
-const getBlogsStart = () => {
+const setLoading = () => {
     return {
-        type: actionTypes.GET_BLOGS_START,
+        type: actionTypes.START,
     }
 }
 
@@ -25,7 +25,7 @@ export const getBlogs = () => {
 
     return async (dispatch) => {
 
-        await dispatch(getBlogsStart());
+        await dispatch(setLoading());
 
         firestore.collection('blogs')
             .get()
@@ -47,5 +47,59 @@ export const getBlogs = () => {
             });
 
 
+    }
+}
+
+export const deleteBlog = (id) => {
+
+    return (dispatch) => {
+        firestore.collection('blogs').doc(id)
+            .delete()
+            .then(() => {
+                console.log('Blog deleted successfully')
+                dispatch(getBlogs());
+            })
+            .catch((err) => {
+                dispatch(setError(err.message))
+                console.log(err.message)
+            })
+    }
+
+
+}
+
+
+export const updateBlog = (heading, desc, id) => {
+    return (dispatch) => {
+        firestore.collection('blogs').doc(id)
+            .update({
+                heading: heading,
+                body: desc,
+                comments: [],
+            })
+            .then(async () => {
+                console.log("Blog successfully updated!");
+               dispatch(getBlogs())
+            })
+            .catch(err => {
+                dispatch(setError(err.message))
+                console.log(err.message);
+            })
+    }
+}
+
+export const updateComment = (newComment, id,comments) => {
+    return (dispatch) => {
+        firestore.collection('blogs').doc(id)
+            .update({
+                comments: [newComment, ...comments],
+            })
+            .then(async () => {
+                console.log("Comment Posted Successfully");
+                await dispatch(getBlogs());
+            })
+            .catch(err => {
+                console.log(err.message);
+            })
     }
 }

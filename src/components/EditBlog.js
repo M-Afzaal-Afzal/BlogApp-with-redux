@@ -1,10 +1,9 @@
 import React from 'react';
 import {Box, Typography, TextField, Button, Container, makeStyles} from "@material-ui/core";
 import {useForm, Controller} from 'react-hook-form';
-import {firestore} from "../utils/firebase";
 import {useParams} from "react-router-dom";
 import {useDispatch, useSelector} from "react-redux";
-import {getBlogs} from "../store/Blog/blogActions";
+import { updateBlog} from "../store/Blog/blogActions";
 import {useHistory} from "react-router-dom";
 import {useSnackbar} from "notistack";
 
@@ -36,6 +35,7 @@ const EditBlog = () => {
 
     const blogs = useSelector(state => state.blogs.blogs)
     const isLoading = useSelector(state => state.blogs.isLoading)
+    const error = useSelector(state => state.blogs.error)
 
     const blog = blogs.filter((blog) => blog.id === id)[0];
 
@@ -56,23 +56,19 @@ const EditBlog = () => {
 
 
     const onSubmit = ({heading, desc}) => {
-        firestore.collection('blogs').doc(id)
-            .update({
-                heading: heading,
-                body: desc,
-                comments: [],
-            })
-            .then(async () => {
-                enqueueSnackbar("Blog successfully updated!", {variant: 'success'})
-                console.log("Blog successfully updated!");
-                await reset({heading: '', desc: ''});
-                history.replace('/')
-                await dispatch(getBlogs());
-            })
-            .catch(err => {
-                enqueueSnackbar("Error While updating the blog!!!", {variant: 'error'})
-                console.log(err.message);
-            })
+
+         dispatch(updateBlog(heading, desc, id));
+
+        if (!error && !isLoading) {
+            enqueueSnackbar("Blog successfully updated!", {variant: 'success'})
+            history.replace('/')
+            reset({heading: '', desc: ''});
+        }
+
+        if (error) {
+            enqueueSnackbar("Error While updating the blog!!!", {variant: 'error'})
+        }
+
     }
 
     return (

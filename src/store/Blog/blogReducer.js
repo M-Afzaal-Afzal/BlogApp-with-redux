@@ -9,7 +9,7 @@ const initialState = {
 const reducer = (state = initialState, action) => {
     switch (action.type) {
 
-        case actionTypes.GET_BLOGS_START: {
+        case actionTypes.START: {
             return {
                 ...state,
                 isLoading: true,
@@ -22,31 +22,6 @@ const reducer = (state = initialState, action) => {
                 isLoading: false,
                 blogs: action.blogs
             };
-        }
-
-        case actionTypes.ADD_BLOG_START: {
-            return;
-        }
-
-        case actionTypes.ADD_BLOG_SUCCESS: {
-            return;
-        }
-
-
-        case actionTypes.EDIT_BLOGS_START: {
-            return;
-        }
-
-        case actionTypes.EDIT_BLOGS_SUCCESS: {
-            return;
-        }
-
-        case actionTypes.DELETE_BLOGS_START: {
-            return;
-        }
-
-        case actionTypes.DELETE_BLOGS_SUCCESS: {
-            return;
         }
 
         case actionTypes.ERROR:{

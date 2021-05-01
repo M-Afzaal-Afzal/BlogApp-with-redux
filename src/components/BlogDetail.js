@@ -2,11 +2,9 @@ import React from 'react';
 import {Box, makeStyles, Container, Typography, TextField, Button} from "@material-ui/core";
 import {useParams} from 'react-router-dom'
 import {Controller, useForm} from "react-hook-form";
-import {firestore} from "../utils/firebase";
 import {useDispatch, useSelector} from "react-redux";
-import {getBlogs} from "../store/Blog/blogActions";
+import {updateComment} from "../store/Blog/blogActions";
 import {useSnackbar} from 'notistack';
-
 
 const useStyles = makeStyles(() => ({
     mainContainer: {
@@ -30,6 +28,7 @@ const BlogDetail = () => {
 
     const blogs = useSelector(state => state.blogs.blogs)
     const isLoading = useSelector(state => state.blogs.isLoading)
+    const error = useSelector(state => state.blogs.error)
     const {id} = useParams();
     const dispatch = useDispatch();
 
@@ -47,22 +46,20 @@ const BlogDetail = () => {
     const {control, handleSubmit, reset, formState: {errors}} = useForm();
 
 
-    const onSubmit = ({comment}) => {
-        firestore.collection('blogs').doc(id)
-            .update({
-                comments: [comment, ...comments],
-            })
-            .then(async () => {
-                console.log("Comment Posted Successfully");
-                enqueueSnackbar("Comment Posted Successfully", {variant: 'success'})
-                await reset({comment: ''});
-                await dispatch(getBlogs());
-            })
-            .catch(err => {
-                enqueueSnackbar("Error While posting the comment!!!", {variant: 'error'})
+    const onSubmit = async ({comment}) => {
 
-                console.log(err.message);
-            })
+        await dispatch(updateComment(comment,id,comments));
+
+        if (!isLoading && !error) {
+            console.log("Comment Posted Successfully");
+            enqueueSnackbar("Comment Posted Successfully", {variant: 'success'})
+            reset({comment: ''});
+        }
+
+        if (error) {
+            enqueueSnackbar("Error While posting the comment!!!", {variant: 'error'})
+        }
+
     }
 
     return (
